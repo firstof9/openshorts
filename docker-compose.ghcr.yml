@@ -13,6 +13,8 @@ services:
       - WHISPER_MODEL=${WHISPER_MODEL:-small}
       - WHISPER_DEVICE=${WHISPER_DEVICE:-cpu}
       - WHISPER_COMPUTE=${WHISPER_COMPUTE:-int8}
+      # Max file upload size in MB (defaults to 4096 = 4GB)
+      - MAX_FILE_SIZE_MB=${MAX_FILE_SIZE_MB:-4096}
       # Optional external render service URL
       - RENDER_SERVICE_URL=http://renderer:3100
     volumes:
