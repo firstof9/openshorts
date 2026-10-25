@@ -31,7 +31,15 @@ RUN npm run build
 
 # ---- static serving (nginx) ----
 FROM nginx:alpine AS prod
+ENV BACKEND_REDIRECT_URL=https://api.openshorts.app
+ENV NGINX_ENVSUBST_FILTER=BACKEND_REDIRECT_URL
+RUN printf '%s\n' \
+    '#!/bin/sh' \
+    'if [ -z "${BACKEND_REDIRECT_URL:-}" ]; then' \
+    '    export BACKEND_REDIRECT_URL="https://api.openshorts.app"' \
+    'fi' > /docker-entrypoint.d/18-backend-redirect-url.envsh \
+    && chmod +x /docker-entrypoint.d/18-backend-redirect-url.envsh
 COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
