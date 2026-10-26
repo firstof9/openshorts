@@ -104,15 +104,18 @@ RUN mkdir -p /usr/local/share/fonts/openshorts \
     && cp fonts/openshorts-fontmap.conf /etc/fonts/conf.d/60-openshorts.conf \
     && fc-cache -f
 
-# Create a non-root user (Moved up)
-RUN groupadd -r appuser && useradd -r -g appuser -d /app -s /sbin/nologin appuser
+# Create a non-root user with UID 1000
+RUN groupadd -g 1000 appuser && useradd -u 1000 -g 1000 -d /app -s /sbin/nologin appuser
+
+# Set user and inductor cache environment so arbitrary UIDs have a valid getpass.getuser()
+ENV USER=appuser LOGNAME=appuser TORCHINDUCTOR_CACHE_DIR=/tmp/torch
 
 # Create directories including Ultralytics cache config. /app/.cache/huggingface
 # exists in-image (appuser-owned via the chown below) so a persistent volume
 # mounted there inherits writable ownership for the ASR model downloads.
-RUN mkdir -p /app/uploads /app/output /app/.cache/huggingface /tmp/Ultralytics
+RUN mkdir -p /app/uploads /app/output /app/.cache/huggingface /tmp/Ultralytics /tmp/torch
 # Fix permissions: /app for code/uploads, /tmp/Ultralytics for AI cache
-RUN chown -R appuser:appuser /app /tmp/Ultralytics
+RUN chown -R appuser:appuser /app /tmp/Ultralytics /tmp/torch
 
 # Switch to non-root user
 USER appuser
