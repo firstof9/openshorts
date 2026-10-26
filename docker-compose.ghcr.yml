@@ -3,6 +3,7 @@ services:
     image: ghcr.io/firstof9/openshorts:latest
     container_name: openshorts-backend
     restart: unless-stopped
+    user: "${UID:-1000}:${GID:-1000}"
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}
       # Video encoder: x264 | nvenc | auto
@@ -43,6 +44,7 @@ services:
     image: ghcr.io/firstof9/openshorts-renderer:latest
     container_name: openshorts-renderer
     restart: unless-stopped
+    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - ./output:/output
     environment:
